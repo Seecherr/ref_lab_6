@@ -1,0 +1,109 @@
+{% extends "store/base.html" %}
+{% block title %}Реєстрація — VeloShop{% endblock %}
+{% block meta_description %}Зареєструйтесь у VeloShop та отримайте доступ до замовлення велосипедів.{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="form-card">
+      <div class="text-center" style="margin-bottom:28px">
+        <div style="font-size:3rem;margin-bottom:12px">🚲</div>
+        <h1 class="form-title">Реєстрація</h1>
+        <p class="form-subtitle">Створіть акаунт і замовляйте улюблені велосипеди</p>
+      </div>
+
+      <!-- Errors -->
+      {% if errors %}
+        <div style="margin-bottom:20px">
+          {% for error in errors %}
+            <div class="alert alert-error">❌ {{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" id="registerForm" novalidate>
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="first_name">Ім'я *</label>
+            <input type="text" id="first_name" name="first_name"
+                   class="form-control" placeholder="Іван"
+                   value="{{ form_data.first_name|default:'' }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="last_name">Прізвище *</label>
+            <input type="text" id="last_name" name="last_name"
+                   class="form-control" placeholder="Петренко"
+                   value="{{ form_data.last_name|default:'' }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="username">Логін *</label>
+          <input type="text" id="username" name="username"
+                 class="form-control" placeholder="ivan_petrenka"
+                 value="{{ form_data.username|default:'' }}" required>
+          <span style="font-size:.78rem;color:var(--text-muted);margin-top:4px;display:block">
+            Лише латинські літери, цифри та _
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email *</label>
+          <input type="email" id="email" name="email"
+                 class="form-control" placeholder="ivan@example.com"
+                 value="{{ form_data.email|default:'' }}" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="password">Пароль *</label>
+            <input type="password" id="password" name="password"
+                   class="form-control" placeholder="Мінімум 8 символів" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password_confirm">Підтвердження *</label>
+            <input type="password" id="password_confirm" name="password_confirm"
+                   class="form-control" placeholder="Повторіть пароль" required>
+          </div>
+        </div>
+
+        <!-- Password hints -->
+        <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:.8rem;color:var(--text-muted)">
+          Пароль має містити: мінімум 8 символів, одну велику літеру, одну цифру.
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-full btn-lg">
+          ✅ Зареєструватися
+        </button>
+
+        <p style="text-align:center;margin-top:20px;font-size:.88rem;color:var(--text-muted)">
+          Вже маєте акаунт?
+          <a href="{% url 'store:login' %}" style="color:var(--primary)">Увійти</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── Пояснення патернів ── -->
+<section class="section-sm">
+  <div class="container">
+    <div class="card" style="padding:32px;max-width:700px;margin:0 auto;background:rgba(0,212,255,0.04)">
+      <h3 style="margin-bottom:16px;font-size:1rem;color:var(--primary)">
+        🏗️ Патерн Facade — процес реєстрації
+      </h3>
+      <p style="color:var(--text-secondary);font-size:.88rem;line-height:1.7">
+        При натисканні кнопки "Зареєструватися" <code style="color:var(--primary);background:rgba(0,212,255,0.1);padding:2px 6px;border-radius:4px">RegistrationFacade.register()</code>
+        автоматично виконує три кроки:
+      </p>
+      <ol style="color:var(--text-secondary);font-size:.85rem;margin-top:12px;padding-left:20px;line-height:2">
+        <li><strong style="color:var(--text-primary)">ClientValidator</strong> — перевіряє коректність усіх даних</li>
+        <li><strong style="color:var(--text-primary)">ClientRepository</strong> — зберігає клієнта в базу даних (SQLite)</li>
+        <li><strong style="color:var(--text-primary)">EmailNotificationService</strong> — надсилає лист підтвердження на email</li>
+      </ol>
+    </div>
+  </div>
+</section>
+{% endblock %}

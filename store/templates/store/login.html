@@ -1,0 +1,42 @@
+{% extends "store/base.html" %}
+{% block title %}Увійти — VeloShop{% endblock %}
+{% block meta_description %}Увійдіть до свого акаунту VeloShop для замовлення велосипедів.{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="form-card">
+      <div class="text-center" style="margin-bottom:28px">
+        <div style="font-size:3rem;margin-bottom:12px">🔐</div>
+        <h1 class="form-title">Вхід в акаунт</h1>
+        <p class="form-subtitle">Увійдіть щоб замовити велосипед мрії</p>
+      </div>
+
+      <form method="post" id="loginForm" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="username">Логін</label>
+          <input type="text" id="username" name="username"
+                 class="form-control" placeholder="Ваш логін" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Пароль</label>
+          <input type="password" id="password" name="password"
+                 class="form-control" placeholder="Ваш пароль" required>
+        </div>
+
+        <button type="submit" id="loginBtn" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">
+          🚀 Увійти
+        </button>
+
+        <p style="text-align:center;margin-top:24px;font-size:.88rem;color:var(--text-muted)">
+          Не маєте акаунту?
+          <a href="{% url 'store:register' %}" style="color:var(--primary)">Зареєструватися</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

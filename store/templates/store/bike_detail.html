@@ -1,0 +1,96 @@
+{% extends "store/base.html" %}
+{% block title %}{{ bike.name }} — VeloShop{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom:28px;font-size:.85rem;color:var(--text-muted)">
+      <a href="{% url 'store:home' %}" style="color:var(--text-muted)">Головна</a> ›
+      <a href="{% url 'store:catalog' %}" style="color:var(--text-muted)">Каталог</a> ›
+      <span style="color:var(--text-primary)">{{ bike.name }}</span>
+    </nav>
+
+    <div class="detail-grid">
+      <!-- Image -->
+      <div>
+        <div class="detail-img-wrap">
+          {% if bike.image %}
+            <img src="{{ bike.image.url }}" alt="{{ bike.name }}">
+          {% else %}
+            <div class="detail-img-placeholder">
+              {% if bike.bike_type == 'electric' %}⚡🚲{% else %}🚲{% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        {% if bike.description %}
+        <div class="card" style="padding:24px;margin-top:20px">
+          <h3 style="margin-bottom:12px;font-size:1rem">Опис</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.7">{{ bike.description }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Details -->
+      <div>
+        {% if bike.bike_type == 'electric' %}
+          <span class="badge badge-electric" style="position:static;display:inline-flex;margin-bottom:14px">⚡ Електровелосипед</span>
+        {% else %}
+          <span class="badge badge-regular" style="position:static;display:inline-flex;margin-bottom:14px">Велосипед</span>
+        {% endif %}
+
+        <h1 style="font-size:2rem;margin-bottom:6px;letter-spacing:-1px">{{ bike.name }}</h1>
+
+        <div style="font-size:2.2rem;font-weight:800;margin:16px 0;
+          {% if bike.bike_type == 'electric' %}color:var(--electric){% else %}color:var(--primary){% endif %}">
+          {{ bike.price|floatformat:0 }} грн
+        </div>
+
+        <!-- Specs -->
+        <div class="card" style="padding:24px;margin-bottom:20px">
+          <h3 style="margin-bottom:14px;font-size:.95rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">
+            Технічні характеристики
+          </h3>
+          <table class="spec-table">
+            <tr><td>Рама</td><td>{{ bike.frame }}</td></tr>
+            <tr><td>Колеса</td><td>{{ bike.wheels }}</td></tr>
+            <tr><td>Гальма</td><td>{{ bike.brakes }}</td></tr>
+            <tr><td>Передачі</td><td>{{ bike.gears }}</td></tr>
+            <tr><td>Колір</td><td>{{ bike.color }}</td></tr>
+            {% if bike.bike_type == 'electric' %}
+              <tr><td>Акумулятор</td><td>{{ bike.battery_capacity }}</td></tr>
+              <tr><td>Мотор</td><td>{{ bike.motor_power }}</td></tr>
+              <tr><td>Запас ходу</td><td>{{ bike.range_km }} км</td></tr>
+              <tr><td>Заряджання</td><td>{{ bike.charge_time }}</td></tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <!-- Actions -->
+        {% if user.is_authenticated %}
+          <a href="{% url 'store:place_order' bike.pk %}"
+             class="btn {% if bike.bike_type == 'electric' %}btn-electric{% else %}btn-primary{% endif %} btn-full btn-lg">
+            {% if bike.bike_type == 'electric' %}⚡{% else %}🛍️{% endif %}
+            Замовити зараз
+          </a>
+        {% else %}
+          <div class="card" style="padding:20px;text-align:center;margin-bottom:16px">
+            <p style="color:var(--text-secondary);margin-bottom:14px;font-size:.9rem">
+              Щоб зробити замовлення — увійдіть або зареєструйтесь
+            </p>
+            <div style="display:flex;gap:10px;justify-content:center">
+              <a href="{% url 'store:login' %}" class="btn btn-outline">Увійти</a>
+              <a href="{% url 'store:register' %}" class="btn btn-primary">Реєстрація</a>
+            </div>
+          </div>
+        {% endif %}
+
+        <a href="{% url 'store:catalog' %}" class="btn btn-ghost btn-full" style="margin-top:10px">
+          ← Повернутись до каталогу
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

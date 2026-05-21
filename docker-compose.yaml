@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: veloshop
+      POSTGRES_USER: veloshop
+      POSTGRES_PASSWORD: veloshop_secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veloshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SECRET_KEY: "production-secret-key-change-me"
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      DB_ENGINE: postgresql
+      DB_NAME: veloshop
+      DB_USER: veloshop
+      DB_PASSWORD: veloshop_secret
+      DB_HOST: db
+      DB_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_bikes &&
+             gunicorn bike_shop.wsgi:application --bind 0.0.0.0:8000"
+
+  test:
+    build: .
+    environment:
+      DJANGO_SECRET_KEY: "test-secret-key"
+      DJANGO_DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1"
+      DB_ENGINE: postgresql
+      DB_NAME: veloshop
+      DB_USER: veloshop
+      DB_PASSWORD: veloshop_secret
+      DB_HOST: db
+      DB_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py test --verbosity=2
+    profiles:
+      - test
+
+volumes:
+  postgres_data:

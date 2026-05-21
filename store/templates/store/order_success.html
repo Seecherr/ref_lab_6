@@ -1,0 +1,61 @@
+{% extends "store/base.html" %}
+{% block title %}Замовлення #{{ order.pk }} оформлено — VeloShop{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="card" style="max-width:640px;margin:0 auto;padding:52px;text-align:center">
+      <div class="success-icon">✅</div>
+
+      <h1 style="font-size:1.8rem;margin-bottom:8px;letter-spacing:-0.5px">
+        Замовлення оформлено!
+      </h1>
+      <p style="color:var(--text-secondary);margin-bottom:32px;font-size:.95rem">
+        Номер замовлення: <strong style="color:var(--primary)">#{{ order.pk }}</strong>
+      </p>
+
+      <div class="card" style="padding:24px;text-align:left;margin-bottom:28px;background:var(--bg-surface)">
+        <table class="spec-table" style="margin:0">
+          <tr>
+            <td>Велосипед</td>
+            <td>{{ order.bike.name }}</td>
+          </tr>
+          <tr>
+            <td>Тип</td>
+            <td>{{ order.bike.get_bike_type_display }}</td>
+          </tr>
+          <tr>
+            <td>Кількість</td>
+            <td>{{ order.quantity }} шт.</td>
+          </tr>
+          <tr>
+            <td>Сума</td>
+            <td style="color:var(--primary);font-size:1.2rem;font-weight:800">{{ order.total_price|floatformat:0 }} грн</td>
+          </tr>
+          <tr>
+            <td>Адреса</td>
+            <td>{{ order.delivery_address }}</td>
+          </tr>
+          <tr>
+            <td>Телефон</td>
+            <td>{{ order.phone }}</td>
+          </tr>
+          <tr>
+            <td>Статус</td>
+            <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:32px">
+        Менеджер зв'яжеться з вами найближчим часом для підтвердження замовлення.
+      </p>
+
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="{% url 'store:my_orders' %}" class="btn btn-primary">📋 Мої замовлення</a>
+        <a href="{% url 'store:catalog' %}" class="btn btn-outline">Продовжити покупки</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "store/base.html" %}
+{% block title %}Замовлення — {{ bike.name }} — VeloShop{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom:28px;font-size:.85rem;color:var(--text-muted)">
+      <a href="{% url 'store:home' %}" style="color:var(--text-muted)">Головна</a> ›
+      <a href="{% url 'store:catalog' %}" style="color:var(--text-muted)">Каталог</a> ›
+      <a href="{% url 'store:bike_detail' bike.pk %}" style="color:var(--text-muted)">{{ bike.name }}</a> ›
+      <span style="color:var(--text-primary)">Замовлення</span>
+    </nav>
+
+    <div class="order-layout">
+      <!-- Order Form -->
+      <div>
+        <div class="card" style="padding:36px">
+          <h1 style="font-size:1.5rem;margin-bottom:6px;letter-spacing:-0.5px">Оформлення замовлення</h1>
+          <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:32px">
+            Заповніть дані для доставки
+          </p>
+
+          <form method="post" id="orderForm" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label class="form-label" for="quantity">Кількість</label>
+              <select id="quantity" name="quantity" class="form-control">
+                {% for i in "12345" %}
+                  <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="delivery_address">Адреса доставки *</label>
+              <textarea id="delivery_address" name="delivery_address"
+                        class="form-control" rows="3"
+                        placeholder="Місто, вулиця, будинок, квартира" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Телефон *</label>
+              <input type="tel" id="phone" name="phone"
+                     class="form-control" placeholder="+380 XX XXX XX XX" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="comment">Коментар до замовлення</label>
+              <textarea id="comment" name="comment"
+                        class="form-control" rows="2"
+                        placeholder="Побажання, зручний час доставки тощо"></textarea>
+            </div>
+
+            <button type="submit" id="placeOrderBtn"
+                    class="btn {% if bike.bike_type == 'electric' %}btn-electric{% else %}btn-primary{% endif %} btn-full btn-lg">
+              {% if bike.bike_type == 'electric' %}⚡{% else %}🛍️{% endif %}
+              Підтвердити замовлення
+            </button>
+          </form>
+        </div>
+
+        <!-- Builder Pattern Explanation -->
+        <div class="card" style="padding:28px;margin-top:20px;background:rgba(0,212,255,0.04)">
+          <h3 style="margin-bottom:12px;font-size:.95rem;color:var(--primary)">
+            🏗️ Патерн Builder — створення замовлення
+          </h3>
+          <p style="color:var(--text-secondary);font-size:.85rem;line-height:1.7">
+            <code style="color:var(--primary);background:rgba(0,212,255,0.1);padding:2px 6px;border-radius:4px">Director.create_order()</code>
+            використовує <strong>один і той самий метод</strong> як для звичайного велосипеда
+            (<code style="color:var(--primary);background:rgba(0,212,255,0.1);padding:2px 6px;border-radius:4px">ConcreteBikeBuilder</code>),
+            так і для електровелосипеда
+            (<code style="color:var(--electric);background:rgba(57,255,20,0.1);padding:2px 6px;border-radius:4px">ConcreteElectricBikeBuilder</code>).
+          </p>
+        </div>
+      </div>
+
+      <!-- Order Summary (sidebar) -->
+      <div class="order-summary">
+        <h3 style="margin-bottom:20px;font-size:1rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">
+          Ваше замовлення
+        </h3>
+
+        {% if bike.image %}
+          <img src="{{ bike.image.url }}" alt="{{ bike.name }}"
+               style="width:100%;border-radius:var(--radius-md);margin-bottom:20px">
+        {% else %}
+          <div style="width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;
+                      font-size:5rem;background:var(--bg-surface);border-radius:var(--radius-md);margin-bottom:20px">
+            {% if bike.bike_type == 'electric' %}⚡🚲{% else %}🚲{% endif %}
+          </div>
+        {% endif %}
+
+        {% if bike.bike_type == 'electric' %}
+          <span class="badge badge-electric" style="position:static;display:inline-flex;margin-bottom:10px">⚡ Електровелосипед</span>
+        {% else %}
+          <span class="badge badge-regular" style="position:static;display:inline-flex;margin-bottom:10px">Велосипед</span>
+        {% endif %}
+
+        <h2 style="font-size:1.2rem;margin-bottom:14px">{{ bike.name }}</h2>
+
+        <table class="spec-table" style="margin:0 0 20px">
+          <tr><td>Рама</td><td>{{ bike.frame }}</td></tr>
+          <tr><td>Колеса</td><td>{{ bike.wheels }}</td></tr>
+          <tr><td>Гальма</td><td>{{ bike.brakes }}</td></tr>
+          {% if bike.bike_type == 'electric' %}
+            <tr><td>Мотор</td><td>{{ bike.motor_power }}</td></tr>
+            <tr><td>Запас ходу</td><td>{{ bike.range_km }} км</td></tr>
+          {% endif %}
+        </table>
+
+        <hr class="divider" style="margin:16px 0">
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--text-muted);font-size:.9rem">Ціна за одиницю:</span>
+          <span style="font-size:1.5rem;font-weight:800;{% if bike.bike_type == 'electric' %}color:var(--electric){% else %}color:var(--primary){% endif %}">
+            {{ bike.price|floatformat:0 }} грн
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "store/base.html" %}
+{% block title %}VeloShop — Головна{% endblock %}
+
+{% block content %}
+
+<!-- ════ HERO ════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        ⚡ Найбільший вибір велосипедів в Харкові
+      </div>
+      <h1>
+        Знайди свій<br>
+        <span class="gradient-text">ідеальний</span><br>
+        велосипед
+      </h1>
+      <p>
+        Від класичних міських байків до потужних електровелосипедів.
+        Безкоштовна доставка по всій Україні та гарантія 2 роки.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'store:catalog' %}" class="btn btn-primary btn-lg">
+          🛍️ Переглянути каталог
+        </a>
+        <a href="{% url 'store:catalog' %}?type=electric" class="btn btn-electric btn-lg">
+          ⚡ Електровелосипеди
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">200+</div>
+          <div class="stat-label">Моделей</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5000+</div>
+          <div class="stat-label">Задоволених клієнтів</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2 роки</div>
+          <div class="stat-label">Гарантія</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FEATURED BIKES ════ -->
+{% if regular_bikes %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">Звичайні</p>
+      <h2 class="section-title">Популярні <span class="gradient-text">велосипеди</span></h2>
+      <p class="section-subtitle">Класичні байки для міста, гір та подорожей</p>
+    </div>
+    <div class="grid-3">
+      {% for bike in regular_bikes %}
+      <article class="card bike-card">
+        <span class="badge badge-regular">Велосипед</span>
+        {% if bike.image %}
+          <img src="{{ bike.image.url }}" alt="{{ bike.name }}" class="bike-card-img">
+        {% else %}
+          <div class="bike-card-img-placeholder">🚲</div>
+        {% endif %}
+        <div class="bike-card-body">
+          <h3 class="bike-card-title">{{ bike.name }}</h3>
+          <ul class="bike-card-specs">
+            <li>{{ bike.frame }}</li>
+            <li>{{ bike.wheels }}</li>
+            <li>{{ bike.gears }}</li>
+          </ul>
+          <div class="bike-card-price">{{ bike.price|floatformat:0 }} грн</div>
+          <div style="display:flex;gap:8px">
+            <a href="{% url 'store:bike_detail' bike.pk %}" class="btn btn-outline btn-sm" style="flex:1;justify-content:center">Детальніше</a>
+            {% if user.is_authenticated %}
+              <a href="{% url 'store:place_order' bike.pk %}" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Замовити</a>
+            {% else %}
+              <a href="{% url 'store:register' %}" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Замовити</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="{% url 'store:catalog' %}?type=regular" class="btn btn-outline">Всі велосипеди →</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ════ ELECTRIC BIKES ════ -->
+{% if electric_bikes %}
+<section class="section" style="background:rgba(57,255,20,0.02);border-top:1px solid rgba(57,255,20,0.08);border-bottom:1px solid rgba(57,255,20,0.08)">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow" style="color:var(--electric)">⚡ Електро</p>
+      <h2 class="section-title">Електро<span class="gradient-text-electric">велосипеди</span></h2>
+      <p class="section-subtitle">Потужні мотори, тривалий заряд, незрівнянний комфорт</p>
+    </div>
+    <div class="grid-3">
+      {% for bike in electric_bikes %}
+      <article class="card bike-card">
+        <span class="badge badge-electric">⚡ Електро</span>
+        {% if bike.image %}
+          <img src="{{ bike.image.url }}" alt="{{ bike.name }}" class="bike-card-img">
+        {% else %}
+          <div class="bike-card-img-placeholder">⚡🚲</div>
+        {% endif %}
+        <div class="bike-card-body">
+          <h3 class="bike-card-title">{{ bike.name }}</h3>
+          <ul class="bike-card-specs">
+            <li>{{ bike.motor_power }}</li>
+            <li>{{ bike.battery_capacity }}</li>
+            <li>Запас {{ bike.range_km }} км</li>
+          </ul>
+          <div class="bike-card-price electric">{{ bike.price|floatformat:0 }} грн</div>
+          <div style="display:flex;gap:8px">
+            <a href="{% url 'store:bike_detail' bike.pk %}" class="btn btn-outline btn-sm" style="flex:1;justify-content:center">Детальніше</a>
+            {% if user.is_authenticated %}
+              <a href="{% url 'store:place_order' bike.pk %}" class="btn btn-electric btn-sm" style="flex:1;justify-content:center">⚡ Замовити</a>
+            {% else %}
+              <a href="{% url 'store:register' %}" class="btn btn-electric btn-sm" style="flex:1;justify-content:center">⚡ Замовити</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="{% url 'store:catalog' %}?type=electric" class="btn btn-outline" style="border-color:rgba(57,255,20,0.3);color:var(--electric)">Всі електровелосипеди →</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ════ HOW IT WORKS ════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">Як це працює</p>
+      <h2 class="section-title">Замовлення за <span class="gradient-text">4 кроки</span></h2>
+    </div>
+    <div class="grid-3" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-blue">🔍</div>
+        <h3 style="margin-bottom:8px">1. Вибір</h3>
+        <p style="color:var(--text-secondary);font-size:.9rem">Оберіть велосипед із нашого каталогу</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-green">📋</div>
+        <h3 style="margin-bottom:8px">2. Замовлення</h3>
+        <p style="color:var(--text-secondary);font-size:.9rem">Оформіть замовлення онлайн за хвилину</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-orange">🚚</div>
+        <h3 style="margin-bottom:8px">3. Доставка</h3>
+        <p style="color:var(--text-secondary);font-size:.9rem">Доставляємо по всій Україні 1–3 дні</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-purple">😊</div>
+        <h3 style="margin-bottom:8px">4. Насолода</h3>
+        <p style="color:var(--text-secondary);font-size:.9rem">Насолоджуйтесь поїздками!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CTA ════ -->
+{% if not user.is_authenticated %}
+<section class="section-sm">
+  <div class="container">
+    <div class="card" style="padding:52px;text-align:center;background:linear-gradient(135deg,rgba(0,212,255,0.07),rgba(57,255,20,0.04))">
+      <p class="section-eyebrow">Спільнота</p>
+      <h2 class="section-title" style="margin-bottom:12px">Приєднуйтесь до <span class="gradient-text">VeloShop</span></h2>
+      <p style="color:var(--text-secondary);margin-bottom:28px">Зареєструйтесь і отримайте доступ до ексклюзивних пропозицій</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="{% url 'store:register' %}" class="btn btn-primary btn-lg">Зареєструватись безкоштовно</a>
+        <a href="{% url 'store:catalog' %}" class="btn btn-outline btn-lg">Переглянути каталог</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "store/base.html" %}
+{% block title %}Каталог велосипедів — VeloShop{% endblock %}
+{% block meta_description %}Каталог велосипедів VeloShop. Звичайні та електровелосипеди з доставкою по Україні.{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-header" style="text-align:left;margin-bottom:32px">
+      <p class="section-eyebrow">Каталог</p>
+      <h1 class="section-title">
+        {% if selected_type == 'electric' %}
+          ⚡ <span class="gradient-text-electric">Електровелосипеди</span>
+        {% elif selected_type == 'regular' %}
+          🚲 <span class="gradient-text">Велосипеди</span>
+        {% else %}
+          Всі <span class="gradient-text">велосипеди</span>
+        {% endif %}
+      </h1>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <a href="{% url 'store:catalog' %}"
+         class="filter-tab {% if selected_type == 'all' %}active{% endif %}">
+        Всі товари
+      </a>
+      <a href="{% url 'store:catalog' %}?type=regular"
+         class="filter-tab {% if selected_type == 'regular' %}active{% endif %}">
+        🚲 Велосипеди
+      </a>
+      <a href="{% url 'store:catalog' %}?type=electric"
+         class="filter-tab {% if selected_type == 'electric' %}active-electric{% endif %}">
+        ⚡ Електровелосипеди
+      </a>
+    </div>
+
+    <!-- Bikes Grid -->
+    {% if bikes %}
+      <div class="grid-3">
+        {% for bike in bikes %}
+        <article class="card bike-card">
+          {% if bike.bike_type == 'electric' %}
+            <span class="badge badge-electric">⚡ Електро</span>
+          {% else %}
+            <span class="badge badge-regular">Велосипед</span>
+          {% endif %}
+
+          {% if bike.image %}
+            <img src="{{ bike.image.url }}" alt="{{ bike.name }}" class="bike-card-img">
+          {% else %}
+            <div class="bike-card-img-placeholder">
+              {% if bike.bike_type == 'electric' %}⚡🚲{% else %}🚲{% endif %}
+            </div>
+          {% endif %}
+
+          <div class="bike-card-body">
+            <h3 class="bike-card-title">{{ bike.name }}</h3>
+
+            <ul class="bike-card-specs">
+              <li>Рама: {{ bike.frame }}</li>
+              <li>Колеса: {{ bike.wheels }}</li>
+              <li>Гальма: {{ bike.brakes }}</li>
+              {% if bike.bike_type == 'electric' %}
+                <li>Мотор: {{ bike.motor_power }}</li>
+                <li>Запас ходу: {{ bike.range_km }} км</li>
+              {% else %}
+                <li>Передачі: {{ bike.gears }}</li>
+              {% endif %}
+            </ul>
+
+            <div class="bike-card-price {% if bike.bike_type == 'electric' %}electric{% endif %}">
+              {{ bike.price|floatformat:0 }} грн
+            </div>
+
+            <div style="display:flex;gap:8px">
+              <a href="{% url 'store:bike_detail' bike.pk %}"
+                 class="btn btn-outline btn-sm" style="flex:1;justify-content:center">
+                Детальніше
+              </a>
+              {% if user.is_authenticated %}
+                <a href="{% url 'store:place_order' bike.pk %}"
+                   class="btn {% if bike.bike_type == 'electric' %}btn-electric{% else %}btn-primary{% endif %} btn-sm"
+                   style="flex:1;justify-content:center">
+                  {% if bike.bike_type == 'electric' %}⚡{% endif %} Замовити
+                </a>
+              {% else %}
+                <a href="{% url 'store:register' %}"
+                   class="btn btn-primary btn-sm" style="flex:1;justify-content:center">
+                  Замовити
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <p style="text-align:center;color:var(--text-muted);margin-top:32px;font-size:.85rem">
+        Показано {{ bikes|length }} моделей
+      </p>
+
+    {% else %}
+      <div style="text-align:center;padding:80px 0">
+        <div style="font-size:4rem;margin-bottom:16px">🔍</div>
+        <h3 style="margin-bottom:8px">Товарів не знайдено</h3>
+        <p style="color:var(--text-muted)">Спробуйте змінити фільтр або поверніться пізніше</p>
+        <a href="{% url 'store:catalog' %}" class="btn btn-primary" style="margin-top:20px">Всі товари</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
